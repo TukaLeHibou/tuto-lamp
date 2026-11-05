@@ -1,0 +1,2095 @@
+<!DOCTYPE html>
+<html lang="fr" data-theme="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>LAMP Stack — Documentation Technique N2</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&family=Outfit:wght@300;400;500;600;700;800&family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;1,6..72,400&display=swap" rel="stylesheet">
+<style>
+/* ═══════════════════════════════════════
+   CSS CUSTOM PROPERTIES
+   ═══════════════════════════════════════ */
+:root {
+  --font-mono: 'JetBrains Mono', 'Fira Code', monospace;
+  --font-display: 'Outfit', sans-serif;
+  --font-body: 'Newsreader', Georgia, serif;
+  --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+[data-theme="dark"] {
+  --bg-deep: #06080d;
+  --bg-primary: #0a0e17;
+  --bg-surface: #111827;
+  --bg-surface-raised: #1a2236;
+  --bg-surface-overlay: rgba(17, 24, 39, 0.85);
+  --bg-code: #0d1117;
+  --bg-code-header: #161b22;
+  --border-subtle: rgba(56, 189, 248, 0.08);
+  --border-default: rgba(56, 189, 248, 0.15);
+  --border-strong: rgba(56, 189, 248, 0.3);
+  --text-primary: #e2e8f0;
+  --text-secondary: #94a3b8;
+  --text-tertiary: #64748b;
+  --text-code: #c9d1d9;
+  --accent-cyan: #38bdf8;
+  --accent-cyan-dim: rgba(56, 189, 248, 0.15);
+  --accent-cyan-glow: rgba(56, 189, 248, 0.4);
+  --accent-amber: #f59e0b;
+  --accent-amber-dim: rgba(245, 158, 11, 0.15);
+  --accent-amber-glow: rgba(245, 158, 11, 0.3);
+  --accent-emerald: #34d399;
+  --accent-emerald-dim: rgba(52, 211, 153, 0.12);
+  --accent-rose: #fb7185;
+  --accent-rose-dim: rgba(251, 113, 133, 0.12);
+  --accent-violet: #a78bfa;
+  --accent-violet-dim: rgba(167, 139, 250, 0.12);
+  --accent-blue: #60a5fa;
+  --gradient-hero: linear-gradient(135deg, #06080d 0%, #0f172a 50%, #0c1220 100%);
+  --gradient-glow: radial-gradient(ellipse at 50% 0%, rgba(56,189,248,0.08) 0%, transparent 60%);
+  --shadow-glow-cyan: 0 0 30px rgba(56,189,248,0.15), 0 0 60px rgba(56,189,248,0.05);
+  --shadow-glow-amber: 0 0 20px rgba(245,158,11,0.15);
+  --glass-bg: rgba(17, 24, 39, 0.6);
+  --glass-border: rgba(56, 189, 248, 0.1);
+  --glass-blur: blur(20px);
+  --scanline: repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(56,189,248,0.015) 2px, rgba(56,189,248,0.015) 4px);
+}
+
+[data-theme="light"] {
+  --bg-deep: #f8fafc;
+  --bg-primary: #ffffff;
+  --bg-surface: #f1f5f9;
+  --bg-surface-raised: #e2e8f0;
+  --bg-surface-overlay: rgba(255,255,255,0.85);
+  --bg-code: #1e293b;
+  --bg-code-header: #334155;
+  --border-subtle: rgba(15, 23, 42, 0.06);
+  --border-default: rgba(15, 23, 42, 0.12);
+  --border-strong: rgba(15, 23, 42, 0.25);
+  --text-primary: #0f172a;
+  --text-secondary: #475569;
+  --text-tertiary: #94a3b8;
+  --text-code: #c9d1d9;
+  --accent-cyan: #0284c7;
+  --accent-cyan-dim: rgba(2, 132, 199, 0.08);
+  --accent-cyan-glow: rgba(2, 132, 199, 0.2);
+  --accent-amber: #d97706;
+  --accent-amber-dim: rgba(217, 119, 6, 0.08);
+  --accent-amber-glow: rgba(217, 119, 6, 0.15);
+  --accent-emerald: #059669;
+  --accent-emerald-dim: rgba(5, 150, 105, 0.08);
+  --accent-rose: #e11d48;
+  --accent-rose-dim: rgba(225, 29, 72, 0.08);
+  --accent-violet: #7c3aed;
+  --accent-violet-dim: rgba(124, 58, 237, 0.08);
+  --accent-blue: #2563eb;
+  --gradient-hero: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 50%, #f1f5f9 100%);
+  --gradient-glow: radial-gradient(ellipse at 50% 0%, rgba(2,132,199,0.06) 0%, transparent 60%);
+  --shadow-glow-cyan: 0 0 30px rgba(2,132,199,0.1);
+  --shadow-glow-amber: 0 0 20px rgba(217,119,6,0.1);
+  --glass-bg: rgba(255,255,255,0.7);
+  --glass-border: rgba(15, 23, 42, 0.08);
+  --glass-blur: blur(20px);
+  --scanline: none;
+}
+
+/* ═══════════════════════════════════════
+   RESET & BASE
+   ═══════════════════════════════════════ */
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+html { scroll-behavior: smooth; scrollbar-width: thin; scrollbar-color: var(--accent-cyan-dim) transparent; }
+
+body {
+  background: var(--bg-deep);
+  color: var(--text-primary);
+  font-family: var(--font-body);
+  font-size: clamp(15px, 1.5vw, 17px);
+  line-height: 1.7;
+  overflow-x: hidden;
+}
+
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background: var(--scanline);
+  pointer-events: none;
+  z-index: 9999;
+}
+
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--accent-cyan-dim); border-radius: 3px; }
+
+::selection { background: var(--accent-cyan); color: var(--bg-deep); }
+
+a { color: var(--accent-cyan); text-decoration: none; transition: color 0.2s; }
+a:hover { color: var(--accent-amber); }
+
+/* ═══════════════════════════════════════
+   ANIMATIONS
+   ═══════════════════════════════════════ */
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(30px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+@keyframes slideInLeft {
+  from { opacity: 0; transform: translateX(-20px); }
+  to { opacity: 1; transform: translateX(0); }
+}
+@keyframes glowPulse {
+  0%, 100% { opacity: 0.4; }
+  50% { opacity: 1; }
+}
+@keyframes dataFlow {
+  0% { transform: translateY(-100%); opacity: 0; }
+  10% { opacity: 1; }
+  90% { opacity: 1; }
+  100% { transform: translateY(calc(var(--flow-distance, 60px))); opacity: 0; }
+}
+@keyframes terminalBlink {
+  0%, 50% { opacity: 1; }
+  51%, 100% { opacity: 0; }
+}
+@keyframes scanDown {
+  from { transform: translateY(-100%); }
+  to { transform: translateY(100vh); }
+}
+@keyframes heroFloat {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-8px); }
+}
+@keyframes borderGlow {
+  0%, 100% { border-color: var(--border-subtle); }
+  50% { border-color: var(--border-strong); }
+}
+
+.reveal {
+  opacity: 0;
+  transform: translateY(30px);
+  transition: opacity 0.8s var(--ease-out-expo), transform 0.8s var(--ease-out-expo);
+}
+.reveal.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* ═══════════════════════════════════════
+   TOP BAR
+   ═══════════════════════════════════════ */
+.topbar {
+  position: fixed;
+  top: 0; left: 0; right: 0;
+  z-index: 100;
+  background: var(--bg-surface-overlay);
+  backdrop-filter: var(--glass-blur);
+  -webkit-backdrop-filter: var(--glass-blur);
+  border-bottom: 1px solid var(--border-subtle);
+  padding: 0 1.5rem;
+  height: 52px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  animation: fadeIn 0.6s ease-out;
+}
+.topbar-left {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  color: var(--text-tertiary);
+}
+.topbar-left .status-dot {
+  width: 6px; height: 6px;
+  background: var(--accent-emerald);
+  border-radius: 50%;
+  box-shadow: 0 0 8px var(--accent-emerald);
+  animation: glowPulse 2s ease-in-out infinite;
+}
+.topbar-right {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+.topbar-right a { color: var(--text-tertiary); }
+.topbar-right a:hover { color: var(--accent-cyan); }
+
+.theme-toggle {
+  background: none;
+  border: 1px solid var(--border-default);
+  color: var(--text-secondary);
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  padding: 0.3rem 0.65rem;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.3s;
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+.theme-toggle:hover {
+  border-color: var(--accent-cyan);
+  color: var(--accent-cyan);
+  box-shadow: var(--shadow-glow-cyan);
+}
+
+.hamburger {
+  display: none;
+  background: none;
+  border: 1px solid var(--border-default);
+  color: var(--text-secondary);
+  padding: 0.35rem 0.5rem;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 1.1rem;
+  line-height: 1;
+}
+
+/* ═══════════════════════════════════════
+   HERO SECTION
+   ═══════════════════════════════════════ */
+.hero {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 6rem 2rem 4rem;
+  position: relative;
+  background: var(--gradient-hero);
+  overflow: hidden;
+}
+
+.hero::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: var(--gradient-glow);
+  pointer-events: none;
+}
+
+.hero::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 800px;
+  height: 800px;
+  background: radial-gradient(circle, rgba(56,189,248,0.03) 0%, transparent 70%);
+  pointer-events: none;
+}
+
+.hero-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  color: var(--accent-cyan);
+  background: var(--accent-cyan-dim);
+  border: 1px solid rgba(56,189,248,0.2);
+  padding: 0.4rem 1rem;
+  border-radius: 100px;
+  margin-bottom: 2rem;
+  animation: fadeUp 0.8s var(--ease-out-expo) 0.2s both;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+.hero h1 {
+  font-family: var(--font-display);
+  font-size: clamp(2.8rem, 7vw, 5.5rem);
+  font-weight: 800;
+  letter-spacing: -0.04em;
+  line-height: 1.05;
+  margin-bottom: 1.25rem;
+  animation: fadeUp 0.8s var(--ease-out-expo) 0.4s both;
+  background: linear-gradient(135deg, var(--text-primary) 0%, var(--accent-cyan) 50%, var(--accent-amber) 100%);
+  background-size: 200% 200%;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.hero .subtitle {
+  font-family: var(--font-body);
+  font-size: clamp(1rem, 2vw, 1.25rem);
+  color: var(--text-secondary);
+  max-width: 600px;
+  margin: 0 auto 3rem;
+  animation: fadeUp 0.8s var(--ease-out-expo) 0.6s both;
+  font-style: italic;
+}
+
+/* Hero Pipeline Visualization */
+.hero-pipeline {
+  display: flex;
+  align-items: center;
+  gap: 0;
+  animation: fadeUp 1s var(--ease-out-expo) 0.8s both;
+  position: relative;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.pipeline-node {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 1.25rem 1.5rem;
+  background: var(--glass-bg);
+  backdrop-filter: var(--glass-blur);
+  border: 1px solid var(--glass-border);
+  border-radius: 16px;
+  position: relative;
+  transition: all 0.4s var(--ease-out-expo);
+  cursor: default;
+  animation: heroFloat 4s ease-in-out infinite;
+}
+
+.pipeline-node:nth-child(1) { animation-delay: 0s; }
+.pipeline-node:nth-child(3) { animation-delay: 0.5s; }
+.pipeline-node:nth-child(5) { animation-delay: 1s; }
+.pipeline-node:nth-child(7) { animation-delay: 1.5s; }
+.pipeline-node:nth-child(9) { animation-delay: 2s; }
+
+.pipeline-node:hover {
+  border-color: var(--accent-cyan);
+  box-shadow: var(--shadow-glow-cyan);
+  transform: translateY(-4px);
+}
+
+.pipeline-node .node-icon {
+  font-size: 1.8rem;
+  line-height: 1;
+}
+.pipeline-node .node-label {
+  font-family: var(--font-mono);
+  font-size: 0.68rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.pipeline-arrow {
+  font-family: var(--font-mono);
+  color: var(--accent-cyan);
+  font-size: 1.4rem;
+  padding: 0 0.5rem;
+  opacity: 0.4;
+  position: relative;
+}
+.pipeline-arrow::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, var(--accent-cyan), transparent);
+  animation: glowPulse 2s ease-in-out infinite;
+}
+
+.hero-scroll-cue {
+  position: absolute;
+  bottom: 2.5rem;
+  font-family: var(--font-mono);
+  font-size: 0.65rem;
+  color: var(--text-tertiary);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+  animation: fadeIn 1s ease-out 1.5s both;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+.hero-scroll-cue .scroll-line {
+  width: 1px;
+  height: 30px;
+  background: linear-gradient(180deg, var(--accent-cyan), transparent);
+  animation: glowPulse 2s ease-in-out infinite;
+}
+
+/* ═══════════════════════════════════════
+   PAGE LAYOUT
+   ═══════════════════════════════════════ */
+.page-wrapper {
+  display: grid;
+  grid-template-columns: 260px 1fr;
+  max-width: 1280px;
+  margin: 0 auto;
+  min-height: 100vh;
+  position: relative;
+}
+
+/* ═══════════════════════════════════════
+   SIDEBAR
+   ═══════════════════════════════════════ */
+.sidebar {
+  position: sticky;
+  top: 52px;
+  height: calc(100vh - 52px);
+  overflow-y: auto;
+  padding: 2rem 1.5rem 2rem 2rem;
+  border-right: 1px solid var(--border-subtle);
+  scrollbar-width: none;
+}
+.sidebar::-webkit-scrollbar { display: none; }
+
+.sidebar-label {
+  font-family: var(--font-mono);
+  font-size: 0.6rem;
+  text-transform: uppercase;
+  letter-spacing: 0.15em;
+  color: var(--text-tertiary);
+  margin-bottom: 1rem;
+  padding-left: 0.75rem;
+}
+
+.toc { list-style: none; }
+.toc li { margin-bottom: 2px; }
+.toc a {
+  font-family: var(--font-display);
+  font-size: 0.82rem;
+  font-weight: 400;
+  color: var(--text-tertiary);
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.4rem 0.75rem;
+  border-radius: 8px;
+  border-left: 2px solid transparent;
+  transition: all 0.25s var(--ease-out-expo);
+  text-decoration: none;
+}
+.toc a:hover {
+  color: var(--text-primary);
+  background: var(--accent-cyan-dim);
+}
+.toc a.active {
+  color: var(--accent-cyan);
+  font-weight: 500;
+  border-left-color: var(--accent-cyan);
+  background: var(--accent-cyan-dim);
+}
+
+.toc .toc-num {
+  font-family: var(--font-mono);
+  font-size: 0.65rem;
+  color: var(--text-tertiary);
+  min-width: 2ch;
+}
+
+.toc .indent { padding-left: 1rem; }
+.toc .indent a { font-size: 0.78rem; }
+
+/* ═══════════════════════════════════════
+   MAIN CONTENT
+   ═══════════════════════════════════════ */
+.content {
+  padding: 2.5rem clamp(1.5rem, 4vw, 3.5rem) 6rem;
+  max-width: 860px;
+}
+
+.page-meta {
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  color: var(--text-tertiary);
+  padding: 0.75rem 0;
+  margin-bottom: 2rem;
+  border-bottom: 1px dashed var(--border-subtle);
+  display: flex;
+  gap: 1.5rem;
+  flex-wrap: wrap;
+}
+.page-meta span {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+.content h2 {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: clamp(1.4rem, 3vw, 1.75rem);
+  color: var(--text-primary);
+  margin: 4rem 0 1rem;
+  padding-bottom: 0.75rem;
+  border-bottom: 1px solid var(--border-subtle);
+  scroll-margin-top: 70px;
+  position: relative;
+  letter-spacing: -0.02em;
+}
+.content h2:first-of-type { margin-top: 0; }
+
+.content h2 .section-num {
+  font-family: var(--font-mono);
+  font-weight: 500;
+  color: var(--accent-cyan);
+  margin-right: 0.5rem;
+  font-size: 0.85em;
+}
+
+.content h3 {
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: 1.1rem;
+  color: var(--text-primary);
+  margin: 2.5rem 0 0.75rem;
+  scroll-margin-top: 70px;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+.content h3::before {
+  content: '';
+  width: 3px;
+  height: 1em;
+  background: var(--accent-cyan);
+  border-radius: 2px;
+}
+
+.content p {
+  margin-bottom: 1rem;
+  max-width: 680px;
+  color: var(--text-secondary);
+}
+.content strong { color: var(--text-primary); font-weight: 600; }
+
+.content code {
+  font-family: var(--font-mono);
+  font-size: 0.82em;
+  background: var(--accent-cyan-dim);
+  color: var(--accent-cyan);
+  padding: 0.15rem 0.45rem;
+  border-radius: 5px;
+  border: 1px solid var(--border-subtle);
+}
+
+/* ═══════════════════════════════════════
+   NOTE BOXES
+   ═══════════════════════════════════════ */
+.note-box {
+  padding: 1rem 1.25rem;
+  border-radius: 10px;
+  margin: 1.5rem 0;
+  font-size: 0.9rem;
+  border: 1px solid;
+  max-width: 720px;
+  position: relative;
+  overflow: hidden;
+}
+.note-box::before {
+  content: '';
+  position: absolute;
+  left: 0; top: 0; bottom: 0;
+  width: 3px;
+}
+.note-box .note-label {
+  font-family: var(--font-mono);
+  font-weight: 600;
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  margin-bottom: 0.35rem;
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.note-box.info {
+  background: var(--accent-cyan-dim);
+  border-color: rgba(56,189,248,0.15);
+}
+.note-box.info::before { background: var(--accent-cyan); }
+.note-box.info .note-label { color: var(--accent-cyan); }
+
+.note-box.warning {
+  background: var(--accent-amber-dim);
+  border-color: rgba(245,158,11,0.15);
+}
+.note-box.warning::before { background: var(--accent-amber); }
+.note-box.warning .note-label { color: var(--accent-amber); }
+
+.note-box.danger {
+  background: var(--accent-rose-dim);
+  border-color: rgba(251,113,133,0.15);
+}
+.note-box.danger::before { background: var(--accent-rose); }
+.note-box.danger .note-label { color: var(--accent-rose); }
+
+.note-box.tip {
+  background: var(--accent-emerald-dim);
+  border-color: rgba(52,211,153,0.12);
+}
+.note-box.tip::before { background: var(--accent-emerald); }
+.note-box.tip .note-label { color: var(--accent-emerald); }
+
+/* ═══════════════════════════════════════
+   CODE BLOCKS
+   ═══════════════════════════════════════ */
+.codeblock {
+  background: var(--bg-code);
+  border-radius: 12px;
+  margin: 1.25rem 0 1.5rem;
+  overflow: hidden;
+  max-width: 760px;
+  border: 1px solid rgba(56,189,248,0.08);
+  transition: border-color 0.3s;
+}
+.codeblock:hover {
+  border-color: rgba(56,189,248,0.2);
+}
+
+.codeblock .cb-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.6rem 1rem;
+  background: var(--bg-code-header);
+  border-bottom: 1px solid rgba(255,255,255,0.05);
+}
+.codeblock .cb-dots { display: flex; gap: 6px; }
+.codeblock .cb-dots span {
+  width: 10px; height: 10px;
+  border-radius: 50%;
+  transition: transform 0.2s;
+}
+.codeblock .cb-dots span:hover { transform: scale(1.3); }
+.codeblock .cb-dots span:nth-child(1) { background: #ff5f57; }
+.codeblock .cb-dots span:nth-child(2) { background: #febc2e; }
+.codeblock .cb-dots span:nth-child(3) { background: #28c840; }
+
+.codeblock .cb-filename {
+  font-family: var(--font-mono);
+  font-size: 0.68rem;
+  color: #6e7681;
+  flex: 1;
+  text-align: center;
+}
+
+.codeblock .cb-copy {
+  font-family: var(--font-mono);
+  font-size: 0.62rem;
+  color: #6e7681;
+  background: none;
+  border: 1px solid rgba(255,255,255,0.1);
+  padding: 0.2rem 0.6rem;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.2s;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+.codeblock .cb-copy:hover {
+  color: var(--accent-cyan);
+  border-color: var(--accent-cyan);
+  box-shadow: 0 0 10px rgba(56,189,248,0.2);
+}
+.codeblock .cb-copy.copied {
+  color: var(--accent-emerald);
+  border-color: var(--accent-emerald);
+}
+
+.codeblock pre {
+  padding: 1.1rem 1.25rem;
+  font-family: var(--font-mono);
+  font-size: 0.78rem;
+  line-height: 1.75;
+  color: var(--text-code);
+  overflow-x: auto;
+  scrollbar-width: thin;
+}
+.codeblock pre .prompt { color: var(--accent-emerald); }
+.codeblock pre .comment { color: #6e7681; font-style: italic; }
+.codeblock pre .keyword { color: #ff7b72; }
+.codeblock pre .string { color: #a5d6ff; }
+.codeblock pre .flag { color: var(--accent-amber); }
+.codeblock pre .value { color: #79c0ff; }
+.codeblock pre .section { color: var(--accent-amber); font-weight: 600; }
+.codeblock pre .directive { color: #d2a8ff; }
+.codeblock pre .arg { color: #79c0ff; }
+
+/* ═══════════════════════════════════════
+   ARCHITECTURE DIAGRAM (SVG-style CSS)
+   ═══════════════════════════════════════ */
+.arch-diagram {
+  max-width: 760px;
+  margin: 2rem 0;
+  padding: 2.5rem 2rem;
+  background: var(--bg-surface);
+  border-radius: 16px;
+  border: 1px solid var(--border-subtle);
+  position: relative;
+  overflow: hidden;
+}
+.arch-diagram::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(ellipse at 50% 30%, rgba(56,189,248,0.04) 0%, transparent 60%);
+  pointer-events: none;
+}
+
+.arch-stack {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0;
+  position: relative;
+  z-index: 1;
+}
+
+.arch-node {
+  width: 320px;
+  padding: 1rem 1.5rem;
+  background: var(--glass-bg);
+  backdrop-filter: var(--glass-blur);
+  border: 1px solid var(--glass-border);
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  transition: all 0.4s var(--ease-out-expo);
+  position: relative;
+}
+.arch-node:hover {
+  border-color: var(--border-strong);
+  transform: scale(1.02);
+}
+
+.arch-node .arch-icon {
+  width: 42px;
+  height: 42px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.3rem;
+  flex-shrink: 0;
+}
+.arch-node .arch-info h4 {
+  font-family: var(--font-mono);
+  font-weight: 600;
+  font-size: 0.82rem;
+  color: var(--text-primary);
+}
+.arch-node .arch-info p {
+  font-size: 0.72rem;
+  color: var(--text-tertiary);
+  margin: 0;
+  font-family: var(--font-mono);
+}
+
+.arch-node.dns .arch-icon { background: rgba(96,165,250,0.15); color: var(--accent-blue); }
+.arch-node.hap .arch-icon { background: var(--accent-amber-dim); color: var(--accent-amber); }
+.arch-node.apache .arch-icon { background: var(--accent-rose-dim); color: var(--accent-rose); }
+.arch-node.php .arch-icon { background: var(--accent-violet-dim); color: var(--accent-violet); }
+.arch-node.db .arch-icon { background: var(--accent-emerald-dim); color: var(--accent-emerald); }
+
+.arch-connector {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  height: 40px;
+  position: relative;
+}
+.arch-connector .conn-line {
+  width: 2px;
+  flex: 1;
+  background: linear-gradient(180deg, var(--accent-cyan), transparent);
+  position: relative;
+  overflow: hidden;
+}
+.arch-connector .conn-line::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 8px;
+  background: var(--accent-cyan);
+  border-radius: 4px;
+  box-shadow: 0 0 8px var(--accent-cyan);
+  animation: dataFlow 2s ease-in-out infinite;
+  --flow-distance: 40px;
+}
+.arch-connector .conn-label {
+  font-family: var(--font-mono);
+  font-size: 0.58rem;
+  color: var(--text-tertiary);
+  position: absolute;
+  right: -120px;
+  top: 50%;
+  transform: translateY(-50%);
+  white-space: nowrap;
+}
+
+.arch-connector:nth-child(2) .conn-line::after { animation-delay: 0s; }
+.arch-connector:nth-child(4) .conn-line::after { animation-delay: 0.4s; }
+.arch-connector:nth-child(6) .conn-line::after { animation-delay: 0.8s; }
+.arch-connector:nth-child(8) .conn-line::after { animation-delay: 1.2s; }
+
+/* ═══════════════════════════════════════
+   TABLES
+   ═══════════════════════════════════════ */
+.wiki-table {
+  width: 100%;
+  max-width: 760px;
+  border-collapse: separate;
+  border-spacing: 0;
+  margin: 1.25rem 0 1.5rem;
+  font-size: 0.85rem;
+  border-radius: 12px;
+  overflow: hidden;
+  border: 1px solid var(--border-subtle);
+}
+.wiki-table thead {
+  background: var(--bg-surface);
+}
+.wiki-table th {
+  font-family: var(--font-mono);
+  font-weight: 600;
+  font-size: 0.7rem;
+  text-align: left;
+  padding: 0.75rem 1rem;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  border-bottom: 1px solid var(--border-default);
+}
+.wiki-table td {
+  padding: 0.7rem 1rem;
+  border-bottom: 1px solid var(--border-subtle);
+  vertical-align: top;
+  color: var(--text-secondary);
+  transition: background 0.2s;
+}
+.wiki-table tbody tr:last-child td { border-bottom: none; }
+.wiki-table tbody tr:hover td {
+  background: var(--accent-cyan-dim);
+}
+.wiki-table .port {
+  font-family: var(--font-mono);
+  font-weight: 600;
+  color: var(--accent-amber);
+}
+.wiki-table .proto {
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  background: var(--bg-surface);
+  padding: 0.15rem 0.5rem;
+  border-radius: 6px;
+  border: 1px solid var(--border-subtle);
+}
+
+/* ═══════════════════════════════════════
+   INTERACTIVE FLOW SIMULATOR
+   ═══════════════════════════════════════ */
+.flow-simulator {
+  max-width: 760px;
+  margin: 1.5rem 0;
+  background: var(--bg-surface);
+  border: 1px solid var(--border-subtle);
+  border-radius: 16px;
+  overflow: hidden;
+}
+
+.flow-tabs {
+  display: flex;
+  background: var(--bg-surface-raised);
+  border-bottom: 1px solid var(--border-subtle);
+  padding: 0.5rem 0.5rem 0;
+  gap: 2px;
+  overflow-x: auto;
+}
+.flow-tab {
+  font-family: var(--font-mono);
+  font-size: 0.68rem;
+  padding: 0.65rem 1rem;
+  background: none;
+  border: none;
+  color: var(--text-tertiary);
+  cursor: pointer;
+  border-radius: 8px 8px 0 0;
+  transition: all 0.25s;
+  white-space: nowrap;
+  position: relative;
+  letter-spacing: 0.02em;
+}
+.flow-tab:hover {
+  color: var(--text-secondary);
+  background: var(--accent-cyan-dim);
+}
+.flow-tab.active {
+  color: var(--accent-cyan);
+  background: var(--bg-surface);
+}
+.flow-tab.active::after {
+  content: '';
+  position: absolute;
+  bottom: -1px;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: var(--accent-cyan);
+  box-shadow: 0 0 10px var(--accent-cyan-glow);
+}
+
+.flow-tab .tab-num {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: var(--border-subtle);
+  font-size: 0.58rem;
+  margin-right: 0.4rem;
+  transition: background 0.25s;
+}
+.flow-tab.active .tab-num {
+  background: var(--accent-cyan);
+  color: var(--bg-deep);
+}
+
+.flow-content {
+  padding: 1.75rem;
+}
+
+.flow-panel {
+  display: none;
+  animation: fadeUp 0.4s var(--ease-out-expo);
+}
+.flow-panel.active { display: block; }
+
+.flow-panel h4 {
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: 1.05rem;
+  margin-bottom: 0.75rem;
+  color: var(--text-primary);
+}
+
+.flow-meta {
+  display: flex;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+  flex-wrap: wrap;
+}
+.flow-meta-tag {
+  font-family: var(--font-mono);
+  font-size: 0.65rem;
+  padding: 0.25rem 0.6rem;
+  background: var(--bg-surface-raised);
+  border: 1px solid var(--border-subtle);
+  border-radius: 6px;
+  color: var(--text-tertiary);
+}
+
+.flow-panel p {
+  color: var(--text-secondary);
+  max-width: 640px;
+}
+
+/* progress bar between steps */
+.flow-progress {
+  display: flex;
+  padding: 0 1.75rem 0.75rem;
+  gap: 3px;
+}
+.flow-progress-seg {
+  flex: 1;
+  height: 2px;
+  background: var(--border-subtle);
+  border-radius: 2px;
+  transition: background 0.4s;
+}
+.flow-progress-seg.filled {
+  background: var(--accent-cyan);
+  box-shadow: 0 0 6px var(--accent-cyan-glow);
+}
+
+/* ═══════════════════════════════════════
+   DETAILS / ACCORDIONS
+   ═══════════════════════════════════════ */
+details {
+  margin: 1.25rem 0;
+  max-width: 760px;
+  border: 1px solid var(--border-subtle);
+  border-radius: 12px;
+  overflow: hidden;
+  transition: border-color 0.3s;
+}
+details:hover { border-color: var(--border-default); }
+details[open] { border-color: var(--border-default); }
+
+details summary {
+  font-family: var(--font-mono);
+  font-weight: 500;
+  font-size: 0.82rem;
+  cursor: pointer;
+  padding: 0.8rem 1.1rem;
+  background: var(--bg-surface);
+  color: var(--text-secondary);
+  transition: all 0.2s;
+  user-select: none;
+  list-style: none;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+details summary::-webkit-details-marker { display: none; }
+details summary::before {
+  content: '';
+  width: 0; height: 0;
+  border-left: 5px solid var(--text-tertiary);
+  border-top: 4px solid transparent;
+  border-bottom: 4px solid transparent;
+  transition: transform 0.3s;
+  flex-shrink: 0;
+}
+details[open] summary::before { transform: rotate(90deg); }
+details summary:hover {
+  background: var(--bg-surface-raised);
+  color: var(--text-primary);
+}
+details .details-body {
+  padding: 1.25rem;
+  border-top: 1px solid var(--border-subtle);
+}
+
+/* ═══════════════════════════════════════
+   TROUBLESHOOTING CARDS
+   ═══════════════════════════════════════ */
+.trouble-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  max-width: 760px;
+}
+
+.trouble-card {
+  border: 1px solid var(--border-subtle);
+  border-radius: 12px;
+  overflow: hidden;
+  transition: all 0.3s var(--ease-out-expo);
+  cursor: pointer;
+}
+.trouble-card:hover {
+  border-color: var(--border-default);
+}
+.trouble-card[open] {
+  border-color: var(--accent-rose);
+  box-shadow: 0 0 20px var(--accent-rose-dim);
+}
+
+.trouble-card summary {
+  padding: 1rem 1.25rem;
+  background: var(--bg-surface);
+  font-family: var(--font-mono);
+  font-weight: 500;
+  font-size: 0.82rem;
+  color: var(--accent-rose);
+  list-style: none;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  cursor: pointer;
+  user-select: none;
+  transition: background 0.2s;
+}
+.trouble-card summary::-webkit-details-marker { display: none; }
+.trouble-card summary:hover { background: var(--bg-surface-raised); }
+
+.trouble-card .trouble-icon {
+  width: 28px;
+  height: 28px;
+  border-radius: 8px;
+  background: var(--accent-rose-dim);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.85rem;
+  flex-shrink: 0;
+}
+.trouble-card .trouble-chevron {
+  margin-left: auto;
+  color: var(--text-tertiary);
+  transition: transform 0.3s;
+  font-size: 0.7rem;
+}
+.trouble-card[open] .trouble-chevron { transform: rotate(180deg); }
+
+.trouble-card .trouble-body {
+  padding: 1rem 1.25rem;
+  border-top: 1px solid var(--border-subtle);
+}
+.trouble-card .trouble-body p {
+  font-size: 0.88rem;
+  margin-bottom: 0.75rem;
+}
+.trouble-card .check-cmd {
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  background: var(--bg-code);
+  color: var(--text-code);
+  padding: 0.5rem 0.9rem;
+  border-radius: 8px;
+  display: inline-block;
+  border: 1px solid rgba(56,189,248,0.08);
+}
+.trouble-card .check-cmd .prompt { color: var(--accent-emerald); }
+
+/* ═══════════════════════════════════════
+   FOOTER
+   ═══════════════════════════════════════ */
+.site-footer {
+  border-top: 1px solid var(--border-subtle);
+  background: var(--bg-surface);
+  padding: 2rem clamp(1.5rem, 4vw, 3.5rem);
+  margin-top: 4rem;
+}
+.footer-inner {
+  max-width: 1280px;
+  margin: 0 auto;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  color: var(--text-tertiary);
+  flex-wrap: wrap;
+  gap: 0.75rem;
+}
+
+/* ═══════════════════════════════════════
+   BACK TO TOP
+   ═══════════════════════════════════════ */
+.back-to-top {
+  position: fixed;
+  bottom: 2rem;
+  right: 2rem;
+  width: 44px;
+  height: 44px;
+  border-radius: 12px;
+  background: var(--glass-bg);
+  backdrop-filter: var(--glass-blur);
+  border: 1px solid var(--border-default);
+  color: var(--accent-cyan);
+  font-size: 1.1rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  transform: translateY(10px);
+  transition: all 0.3s var(--ease-out-expo);
+  z-index: 50;
+}
+.back-to-top.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+.back-to-top:hover {
+  background: var(--accent-cyan);
+  color: var(--bg-deep);
+  box-shadow: var(--shadow-glow-cyan);
+}
+
+/* ═══════════════════════════════════════
+   MOBILE SIDEBAR OVERLAY
+   ═══════════════════════════════════════ */
+.sidebar-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.5);
+  z-index: 90;
+  backdrop-filter: blur(4px);
+}
+.sidebar-overlay.open { display: block; }
+
+/* ═══════════════════════════════════════
+   RESPONSIVE
+   ═══════════════════════════════════════ */
+@media (max-width: 900px) {
+  .page-wrapper { grid-template-columns: 1fr; }
+
+  .sidebar {
+    position: fixed;
+    top: 52px;
+    left: -300px;
+    width: 280px;
+    height: calc(100vh - 52px);
+    z-index: 95;
+    background: var(--bg-primary);
+    transition: left 0.35s var(--ease-out-expo);
+    border-right: 1px solid var(--border-subtle);
+  }
+  .sidebar.open { left: 0; }
+
+  .hamburger { display: block; }
+
+  .hero h1 { font-size: clamp(2rem, 6vw, 3.5rem); }
+
+  .pipeline-arrow { display: none; }
+  .hero-pipeline {
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+  .pipeline-node { width: 220px; }
+
+  .arch-node { width: 260px; }
+  .arch-connector .conn-label { display: none; }
+
+  .flow-tabs { padding: 0.4rem; gap: 0; }
+  .flow-tab { font-size: 0.6rem; padding: 0.5rem 0.6rem; }
+}
+
+@media (max-width: 500px) {
+  .topbar-left span:not(.status-dot) { display: none; }
+  .content { padding: 1.5rem 1rem 4rem; }
+  .hero { padding: 5rem 1.25rem 3rem; min-height: 90vh; }
+}
+</style>
+</head>
+<body>
+
+<!-- ═══════════════════ TOP BAR ═══════════════════ -->
+<div class="topbar">
+  <div class="topbar-left">
+    <span class="status-dot"></span>
+    <span>lamp-stack-docs / support-n2</span>
+  </div>
+  <div class="topbar-right">
+    <span style="color:var(--text-tertiary)">v1.0 — 2026-03-13</span>
+    <button class="theme-toggle" onclick="toggleTheme()" aria-label="Toggle theme">
+      <span class="theme-icon">&#9790;</span> Theme
+    </button>
+    <button class="hamburger" onclick="toggleSidebar()" aria-label="Menu">&#9776;</button>
+  </div>
+</div>
+
+<!-- ═══════════════════ HERO ═══════════════════ -->
+<section class="hero" id="top">
+  <span class="hero-badge"><span class="status-dot" style="width:5px;height:5px"></span> Documentation technique interne</span>
+  <h1>LAMP Stack</h1>
+  <p class="subtitle">DNS &rarr; HAProxy &rarr; Apache2 &rarr; PHP-FPM &rarr; MariaDB<br>Guide complet pour le support de niveau 2</p>
+
+  <div class="hero-pipeline">
+    <div class="pipeline-node">
+      <span class="node-icon">&#127760;</span>
+      <span class="node-label">DNS</span>
+    </div>
+    <span class="pipeline-arrow">&#10230;</span>
+    <div class="pipeline-node">
+      <span class="node-icon">&#9878;</span>
+      <span class="node-label">HAProxy</span>
+    </div>
+    <span class="pipeline-arrow">&#10230;</span>
+    <div class="pipeline-node">
+      <span class="node-icon">&#9881;</span>
+      <span class="node-label">Apache2</span>
+    </div>
+    <span class="pipeline-arrow">&#10230;</span>
+    <div class="pipeline-node">
+      <span class="node-icon">&#128051;</span>
+      <span class="node-label">PHP-FPM</span>
+    </div>
+    <span class="pipeline-arrow">&#10230;</span>
+    <div class="pipeline-node">
+      <span class="node-icon">&#128450;</span>
+      <span class="node-label">MariaDB</span>
+    </div>
+  </div>
+
+  <div class="hero-scroll-cue">
+    <span>Scroll</span>
+    <div class="scroll-line"></div>
+  </div>
+</section>
+
+<!-- ═══════════════════ SIDEBAR OVERLAY ═══════════════════ -->
+<div class="sidebar-overlay" onclick="toggleSidebar()"></div>
+
+<!-- ═══════════════════ PAGE LAYOUT ═══════════════════ -->
+<div class="page-wrapper">
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-label">Table des mati&egrave;res</div>
+    <ul class="toc">
+      <li><a href="#synopsis"><span class="toc-num">1</span> Synopsis</a></li>
+      <li><a href="#architecture"><span class="toc-num">2</span> Architecture</a></li>
+      <li class="indent"><a href="#schema"><span class="toc-num">2.1</span> Sch&eacute;ma r&eacute;seau</a></li>
+      <li class="indent"><a href="#roles"><span class="toc-num">2.2</span> R&ocirc;le de chaque brique</a></li>
+      <li><a href="#flow"><span class="toc-num">3</span> Flux d'une requ&ecirc;te</a></li>
+      <li class="indent"><a href="#flow-inter"><span class="toc-num">3.1</span> Simulateur interactif</a></li>
+      <li><a href="#configs"><span class="toc-num">4</span> Configurations</a></li>
+      <li class="indent"><a href="#cfg-haproxy"><span class="toc-num">4.1</span> HAProxy</a></li>
+      <li class="indent"><a href="#cfg-apache"><span class="toc-num">4.2</span> Apache2</a></li>
+      <li class="indent"><a href="#cfg-php"><span class="toc-num">4.3</span> PHP-FPM</a></li>
+      <li class="indent"><a href="#cfg-mariadb"><span class="toc-num">4.4</span> MariaDB</a></li>
+      <li class="indent"><a href="#cfg-ssl"><span class="toc-num">4.5</span> SSL / Certbot</a></li>
+      <li><a href="#ports"><span class="toc-num">5</span> Ports &amp; protocoles</a></li>
+      <li><a href="#troubleshoot"><span class="toc-num">6</span> Troubleshooting</a></li>
+    </ul>
+  </aside>
+
+  <!-- MAIN CONTENT -->
+  <main class="content">
+
+    <div class="page-meta">
+      <span>&#128197; 2026-03-13</span>
+      <span>&#128218; Infrastructure</span>
+      <span>&#9997; &Eacute;quipe Infra</span>
+    </div>
+
+    <!-- ────────── 1. SYNOPSIS ────────── -->
+    <h2 id="synopsis" class="reveal"><span class="section-num">1.</span> Synopsis</h2>
+
+    <div class="reveal">
+      <p>
+        Ce document d&eacute;crit le fonctionnement d'une stack <strong>LAMP</strong> (Linux, Apache, MySQL/MariaDB, PHP) plac&eacute;e derri&egrave;re un reverse proxy <strong>HAProxy</strong> avec terminaison TLS. Il s'adresse aux techniciens support de <strong>niveau 2</strong> et couvre le parcours complet d'une requ&ecirc;te HTTP : de la r&eacute;solution DNS jusqu'&agrave; la r&eacute;ponse client.
+      </p>
+    </div>
+
+    <div class="note-box info reveal">
+      <span class="note-label">&#8505; Note</span>
+      Dans cette architecture, HAProxy remplace la couche SSL d'Apache. Apache n'&eacute;coute qu'en HTTP sur le r&eacute;seau priv&eacute;. Toute la terminaison TLS est centralis&eacute;e sur HAProxy.
+    </div>
+
+    <div class="reveal">
+      <p>
+        La stack typique utilise un conteneur LXC d&eacute;di&eacute; par service, reli&eacute;s par un bridge interne (<code>vmbr1</code>) sur un r&eacute;seau priv&eacute; <code>10.0.0.0/24</code>. HAProxy est le seul point d'entr&eacute;e expos&eacute; aux ports 80 et 443.
+      </p>
+    </div>
+
+    <!-- ────────── 2. ARCHITECTURE ────────── -->
+    <h2 id="architecture" class="reveal"><span class="section-num">2.</span> Architecture</h2>
+
+    <h3 id="schema" class="reveal">2.1 Sch&eacute;ma r&eacute;seau</h3>
+
+    <div class="arch-diagram reveal">
+      <div class="arch-stack">
+        <div class="arch-node dns">
+          <div class="arch-icon">&#127760;</div>
+          <div class="arch-info">
+            <h4>DNS Resolver</h4>
+            <p>exemple.fr &rarr; IP publique</p>
+          </div>
+        </div>
+
+        <div class="arch-connector">
+          <div class="conn-line"></div>
+          <span class="conn-label">Port 443 (HTTPS)</span>
+        </div>
+
+        <div class="arch-node hap">
+          <div class="arch-icon">&#9878;</div>
+          <div class="arch-info">
+            <h4>HAProxy</h4>
+            <p>Terminaison SSL &middot; ACL Host routing</p>
+          </div>
+        </div>
+
+        <div class="arch-connector">
+          <div class="conn-line"></div>
+          <span class="conn-label">Port 80 (HTTP interne)</span>
+        </div>
+
+        <div class="arch-node apache">
+          <div class="arch-icon">&#9881;</div>
+          <div class="arch-info">
+            <h4>Apache2</h4>
+            <p>VirtualHost &middot; DocumentRoot &middot; .php &rarr; FPM</p>
+          </div>
+        </div>
+
+        <div class="arch-connector">
+          <div class="conn-line"></div>
+          <span class="conn-label">Socket UNIX</span>
+        </div>
+
+        <div class="arch-node php">
+          <div class="arch-icon">&#128051;</div>
+          <div class="arch-info">
+            <h4>PHP-FPM</h4>
+            <p>Ex&eacute;cute le code &middot; G&eacute;n&egrave;re le HTML</p>
+          </div>
+        </div>
+
+        <div class="arch-connector">
+          <div class="conn-line"></div>
+          <span class="conn-label">Socket / Port 3306</span>
+        </div>
+
+        <div class="arch-node db">
+          <div class="arch-icon">&#128450;</div>
+          <div class="arch-info">
+            <h4>MariaDB</h4>
+            <p>Stockage donn&eacute;es &middot; Requ&ecirc;tes SQL</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <h3 id="roles" class="reveal">2.2 R&ocirc;le de chaque brique</h3>
+
+    <table class="wiki-table reveal">
+      <thead>
+        <tr><th>Composant</th><th>R&ocirc;le</th><th>&Eacute;coute</th><th>Config principale</th></tr>
+      </thead>
+      <tbody>
+        <tr><td><strong>DNS</strong></td><td>R&eacute;solution nom &rarr; IP</td><td class="port">53/udp</td><td>Zone chez le registrar</td></tr>
+        <tr><td><strong>HAProxy</strong></td><td>Reverse proxy, TLS termination, routage ACL</td><td class="port">80, 443</td><td><code>/etc/haproxy/haproxy.cfg</code></td></tr>
+        <tr><td><strong>Apache2</strong></td><td>Serveur web, VirtualHosts, d&eacute;l&eacute;gation PHP</td><td class="port">80 (interne)</td><td><code>/etc/apache2/sites-enabled/</code></td></tr>
+        <tr><td><strong>PHP-FPM</strong></td><td>Interpr&eacute;teur PHP, pool de workers</td><td class="port">socket unix</td><td><code>/etc/php/8.2/fpm/pool.d/</code></td></tr>
+        <tr><td><strong>MariaDB</strong></td><td>SGBD, stockage persistant, requ&ecirc;tes SQL</td><td class="port">3306</td><td><code>/etc/mysql/mariadb.conf.d/</code></td></tr>
+      </tbody>
+    </table>
+
+    <!-- ────────── 3. FLUX ────────── -->
+    <h2 id="flow" class="reveal"><span class="section-num">3.</span> Flux d'une requ&ecirc;te</h2>
+
+    <div class="reveal">
+      <p>Un utilisateur saisit <code>https://exemple.fr/index.php</code> dans son navigateur. Voici ce qui se passe :</p>
+    </div>
+
+    <h3 id="flow-inter" class="reveal">3.1 Simulateur interactif</h3>
+
+    <div class="reveal">
+      <p>Cliquez sur chaque &eacute;tape pour voir le d&eacute;tail :</p>
+    </div>
+
+    <div class="flow-simulator reveal">
+      <div class="flow-tabs" role="tablist">
+        <button class="flow-tab active" onclick="showStep(0)" role="tab"><span class="tab-num">1</span>DNS</button>
+        <button class="flow-tab" onclick="showStep(1)" role="tab"><span class="tab-num">2</span>HAProxy</button>
+        <button class="flow-tab" onclick="showStep(2)" role="tab"><span class="tab-num">3</span>Apache</button>
+        <button class="flow-tab" onclick="showStep(3)" role="tab"><span class="tab-num">4</span>PHP</button>
+        <button class="flow-tab" onclick="showStep(4)" role="tab"><span class="tab-num">5</span>BDD</button>
+        <button class="flow-tab" onclick="showStep(5)" role="tab"><span class="tab-num">6</span>Retour</button>
+      </div>
+      <div class="flow-progress">
+        <div class="flow-progress-seg filled"></div>
+        <div class="flow-progress-seg"></div>
+        <div class="flow-progress-seg"></div>
+        <div class="flow-progress-seg"></div>
+        <div class="flow-progress-seg"></div>
+        <div class="flow-progress-seg"></div>
+      </div>
+      <div class="flow-content">
+        <div class="flow-panel active" id="fstep-0">
+          <h4>&Eacute;tape 1 &mdash; R&eacute;solution DNS</h4>
+          <div class="flow-meta">
+            <span class="flow-meta-tag">Protocole : UDP/53</span>
+            <span class="flow-meta-tag">Latence : ~5-50ms</span>
+            <span class="flow-meta-tag">Acteur : r&eacute;solveur DNS</span>
+          </div>
+          <p>Le navigateur interroge le r&eacute;solveur DNS configur&eacute; (ex: <code>8.8.8.8</code>). Le r&eacute;solveur parcourt la hi&eacute;rarchie : <strong>serveur racine &rarr; TLD (.fr) &rarr; serveur autoritaire</strong> pour obtenir l'enregistrement A. Le r&eacute;sultat est mis en cache selon le TTL.</p>
+          <p><strong>R&eacute;sultat :</strong> <code>exemple.fr &rarr; 203.0.113.50</code></p>
+        </div>
+        <div class="flow-panel" id="fstep-1">
+          <h4>&Eacute;tape 2 &mdash; R&eacute;ception par HAProxy</h4>
+          <div class="flow-meta">
+            <span class="flow-meta-tag">Protocole : TCP/443</span>
+            <span class="flow-meta-tag">Mode : HTTP</span>
+            <span class="flow-meta-tag">Acteur : HAProxy</span>
+          </div>
+          <p>Le paquet arrive sur le port 443. HAProxy effectue le <strong>handshake TLS</strong> (terminaison SSL), d&eacute;chiffre le contenu et lit le header <code>Host: exemple.fr</code>. Il compare aux <strong>ACL</strong> d&eacute;finies et route vers le backend correspondant.</p>
+          <p>Si la requ&ecirc;te arrive sur le port 80, HAProxy renvoie un <strong>301 redirect</strong> vers HTTPS.</p>
+        </div>
+        <div class="flow-panel" id="fstep-2">
+          <h4>&Eacute;tape 3 &mdash; Traitement Apache2</h4>
+          <div class="flow-meta">
+            <span class="flow-meta-tag">Protocole : TCP/80</span>
+            <span class="flow-meta-tag">Interne uniquement</span>
+            <span class="flow-meta-tag">Acteur : Apache httpd</span>
+          </div>
+          <p>Apache re&ccedil;oit la requ&ecirc;te en <strong>HTTP pur</strong> (SSL d&eacute;j&agrave; termin&eacute;). Il identifie le <strong>VirtualHost</strong> correspondant, localise le fichier dans le <code>DocumentRoot</code>.</p>
+          <p>Si c'est un <code>.php</code>, Apache le transmet &agrave; <strong>PHP-FPM</strong> via le socket UNIX. Les fichiers statiques (CSS, JS, images) sont servis directement.</p>
+        </div>
+        <div class="flow-panel" id="fstep-3">
+          <h4>&Eacute;tape 4 &mdash; Ex&eacute;cution PHP-FPM</h4>
+          <div class="flow-meta">
+            <span class="flow-meta-tag">Socket UNIX</span>
+            <span class="flow-meta-tag">Worker pool</span>
+            <span class="flow-meta-tag">Acteur : PHP-FPM</span>
+          </div>
+          <p>Un <strong>worker PHP-FPM</strong> libre prend la requ&ecirc;te. Il ex&eacute;cute le script : initialisation <code>$_GET</code>, <code>$_POST</code>, <code>$_SERVER</code>, et si n&eacute;cessaire, ouverture d'une <strong>connexion PDO</strong> vers MariaDB.</p>
+          <p>Le script g&eacute;n&egrave;re le HTML de sortie retourn&eacute; &agrave; Apache.</p>
+        </div>
+        <div class="flow-panel" id="fstep-4">
+          <h4>&Eacute;tape 5 &mdash; Requ&ecirc;te MariaDB</h4>
+          <div class="flow-meta">
+            <span class="flow-meta-tag">Socket ou TCP/3306</span>
+            <span class="flow-meta-tag">Protocole MySQL</span>
+            <span class="flow-meta-tag">Acteur : MariaDB/InnoDB</span>
+          </div>
+          <p>PHP envoie une requ&ecirc;te SQL via <code>PDO</code> ou <code>mysqli</code>. MariaDB l'ex&eacute;cute avec le moteur <strong>InnoDB</strong> : parsing &rarr; optimisation &rarr; ex&eacute;cution &rarr; retour du jeu de r&eacute;sultats.</p>
+        </div>
+        <div class="flow-panel" id="fstep-5">
+          <h4>&Eacute;tape 6 &mdash; R&eacute;ponse au client</h4>
+          <div class="flow-meta">
+            <span class="flow-meta-tag">Chemin inverse</span>
+            <span class="flow-meta-tag">~50-200ms total</span>
+            <span class="flow-meta-tag">HTTP 200 OK</span>
+          </div>
+          <p>Le HTML g&eacute;n&eacute;r&eacute; remonte : <code>MariaDB &rarr; PHP-FPM &rarr; Apache2 &rarr; HAProxy &rarr; Client</code></p>
+          <p>HAProxy <strong>r&eacute;encapsule en TLS</strong> et l'envoie au navigateur. Les assets statiques d&eacute;clenchent des requ&ecirc;tes suppl&eacute;mentaires qui suivent le m&ecirc;me chemin sans passer par PHP.</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="note-box tip reveal">
+      <span class="note-label">&#9889; Astuce N2</span>
+      Pour identifier o&ugrave; une requ&ecirc;te bloque, ajoutez des headers personnalis&eacute;s &agrave; chaque couche. HAProxy injecte <code>X-Forwarded-For</code> et Apache peut loguer les temps de r&eacute;ponse backend avec <code>%D</code> dans le LogFormat.
+    </div>
+
+    <!-- ────────── 4. CONFIGURATIONS ────────── -->
+    <h2 id="configs" class="reveal"><span class="section-num">4.</span> Configurations</h2>
+
+    <h3 id="cfg-haproxy" class="reveal">4.1 HAProxy</h3>
+
+    <div class="reveal">
+      <p>Le fichier principal <code>/etc/haproxy/haproxy.cfg</code> se compose de 4 sections : <code>global</code>, <code>defaults</code>, <code>frontend</code> et <code>backend</code>.</p>
+    </div>
+
+    <div class="codeblock reveal">
+      <div class="cb-header">
+        <div class="cb-dots"><span></span><span></span><span></span></div>
+        <span class="cb-filename">/etc/haproxy/haproxy.cfg</span>
+        <button class="cb-copy" onclick="copyCode(this)">copier</button>
+      </div>
+      <pre><span class="section">global</span>
+    <span class="directive">log</span> /dev/log local0
+    <span class="directive">maxconn</span> <span class="value">4096</span>
+    <span class="directive">ssl-default-bind-options</span> ssl-min-ver TLSv1.2
+
+<span class="section">defaults</span>
+    <span class="directive">log</span>     global
+    <span class="directive">mode</span>    http
+    <span class="directive">option</span>  httplog
+    <span class="directive">timeout connect</span> <span class="value">5000ms</span>
+    <span class="directive">timeout client</span>  <span class="value">50000ms</span>
+    <span class="directive">timeout server</span>  <span class="value">50000ms</span>
+
+<span class="comment"># ── Frontend : redirection HTTP → HTTPS ──</span>
+<span class="section">frontend http_front</span>
+    <span class="directive">bind</span> *:<span class="value">80</span>
+    <span class="directive">redirect</span> scheme https code <span class="value">301</span>
+
+<span class="comment"># ── Frontend : entrée HTTPS ──</span>
+<span class="section">frontend https_front</span>
+    <span class="directive">bind</span> *:<span class="value">443</span> ssl crt /etc/haproxy/certs/
+
+    <span class="comment"># ACL : routage par header Host</span>
+    <span class="directive">acl</span> host_www     hdr(host) -i <span class="string">exemple.fr</span>
+    <span class="directive">acl</span> host_api     hdr(host) -i <span class="string">api.exemple.fr</span>
+
+    <span class="directive">use_backend</span> backend_www    <span class="keyword">if</span> host_www
+    <span class="directive">use_backend</span> backend_api    <span class="keyword">if</span> host_api
+    <span class="directive">default_backend</span> backend_deny
+
+<span class="comment"># ── Backends ──</span>
+<span class="section">backend backend_www</span>
+    <span class="directive">server</span> web1 <span class="value">10.0.0.10:80</span> check inter 10s
+
+<span class="section">backend backend_api</span>
+    <span class="directive">server</span> api1 <span class="value">10.0.0.11:80</span> check inter 10s
+
+<span class="section">backend backend_deny</span>
+    <span class="directive">http-request</span> deny deny_status <span class="value">403</span></pre>
+    </div>
+
+    <div class="note-box warning reveal">
+      <span class="note-label">&#9888; Attention</span>
+      Toujours tester avant de red&eacute;marrer : <code>haproxy -c -f /etc/haproxy/haproxy.cfg</code>
+    </div>
+
+    <h3 id="cfg-apache" class="reveal">4.2 Apache2</h3>
+
+    <div class="reveal">
+      <p>Apache n'&eacute;coute qu'en HTTP sur le r&eacute;seau interne. Chaque site a son VirtualHost.</p>
+    </div>
+
+    <div class="codeblock reveal">
+      <div class="cb-header">
+        <div class="cb-dots"><span></span><span></span><span></span></div>
+        <span class="cb-filename">/etc/apache2/sites-available/exemple.conf</span>
+        <button class="cb-copy" onclick="copyCode(this)">copier</button>
+      </div>
+      <pre><span class="directive">&lt;VirtualHost</span> <span class="value">*:80</span><span class="directive">&gt;</span>
+    <span class="directive">ServerName</span>    <span class="string">exemple.fr</span>
+    <span class="directive">DocumentRoot</span>  <span class="string">/var/www/exemple/public</span>
+
+    <span class="directive">ErrorLog</span>  ${APACHE_LOG_DIR}/<span class="string">exemple-error.log</span>
+    <span class="directive">CustomLog</span> ${APACHE_LOG_DIR}/<span class="string">exemple-access.log</span> combined
+
+    <span class="directive">&lt;Directory</span> <span class="string">/var/www/exemple/public</span><span class="directive">&gt;</span>
+        <span class="directive">Options</span>       <span class="flag">-Indexes +FollowSymLinks</span>
+        <span class="directive">AllowOverride</span> <span class="value">All</span>
+        <span class="directive">Require</span>       <span class="value">all granted</span>
+    <span class="directive">&lt;/Directory&gt;</span>
+
+    <span class="comment"># Délégation PHP → PHP-FPM</span>
+    <span class="directive">&lt;FilesMatch</span> <span class="string">\.php$</span><span class="directive">&gt;</span>
+        <span class="directive">SetHandler</span> <span class="string">"proxy:unix:/run/php/php8.2-fpm.sock|fcgi://localhost"</span>
+    <span class="directive">&lt;/FilesMatch&gt;</span>
+<span class="directive">&lt;/VirtualHost&gt;</span></pre>
+    </div>
+
+    <details class="reveal">
+      <summary>Commandes Apache utiles</summary>
+      <div class="details-body">
+        <div class="codeblock">
+          <div class="cb-header">
+            <div class="cb-dots"><span></span><span></span><span></span></div>
+            <span class="cb-filename">shell</span>
+            <button class="cb-copy" onclick="copyCode(this)">copier</button>
+          </div>
+          <pre><span class="prompt">$</span> a2ensite exemple.conf              <span class="comment"># Activer le site</span>
+<span class="prompt">$</span> a2enmod proxy_fcgi rewrite          <span class="comment"># Activer les modules</span>
+<span class="prompt">$</span> apachectl -t                        <span class="comment"># Tester la syntaxe</span>
+<span class="prompt">$</span> systemctl reload apache2             <span class="comment"># Appliquer sans coupure</span>
+<span class="prompt">$</span> tail -f /var/log/apache2/error.log   <span class="comment"># Logs temps réel</span></pre>
+        </div>
+      </div>
+    </details>
+
+    <h3 id="cfg-php" class="reveal">4.3 PHP-FPM</h3>
+
+    <div class="reveal">
+      <p>PHP-FPM g&egrave;re un pool de processus pour ex&eacute;cuter le code PHP. Chaque site peut avoir son propre pool.</p>
+    </div>
+
+    <div class="codeblock reveal">
+      <div class="cb-header">
+        <div class="cb-dots"><span></span><span></span><span></span></div>
+        <span class="cb-filename">/etc/php/8.2/fpm/pool.d/exemple.conf</span>
+        <button class="cb-copy" onclick="copyCode(this)">copier</button>
+      </div>
+      <pre><span class="section">[exemple]</span>
+<span class="directive">user</span>  = <span class="value">www-data</span>
+<span class="directive">group</span> = <span class="value">www-data</span>
+
+<span class="comment">; Socket UNIX — plus rapide que TCP en local</span>
+<span class="directive">listen</span>       = <span class="string">/run/php/php8.2-fpm.sock</span>
+<span class="directive">listen.owner</span> = <span class="value">www-data</span>
+<span class="directive">listen.group</span> = <span class="value">www-data</span>
+
+<span class="comment">; Gestion dynamique du pool</span>
+<span class="directive">pm</span>                   = <span class="value">dynamic</span>
+<span class="directive">pm.max_children</span>      = <span class="value">20</span>     <span class="comment">; max simultanés</span>
+<span class="directive">pm.start_servers</span>     = <span class="value">5</span>      <span class="comment">; au démarrage</span>
+<span class="directive">pm.min_spare_servers</span> = <span class="value">3</span>      <span class="comment">; minimum idle</span>
+<span class="directive">pm.max_spare_servers</span> = <span class="value">10</span>     <span class="comment">; maximum idle</span>
+
+<span class="directive">php_admin_value[error_log]</span> = <span class="string">/var/log/php/exemple-error.log</span>
+<span class="directive">php_admin_flag[log_errors]</span> = <span class="value">on</span></pre>
+    </div>
+
+    <div class="note-box info reveal">
+      <span class="note-label">&#8505; Note</span>
+      <code>pm = dynamic</code> convient &agrave; la plupart des cas. Utilisez <code>ondemand</code> pour les sites &agrave; faible trafic et <code>static</code> pour le fort trafic pr&eacute;visible.
+    </div>
+
+    <details class="reveal">
+      <summary>Directives php.ini importantes</summary>
+      <div class="details-body">
+        <div class="codeblock">
+          <div class="cb-header">
+            <div class="cb-dots"><span></span><span></span><span></span></div>
+            <span class="cb-filename">/etc/php/8.2/fpm/php.ini (extraits)</span>
+            <button class="cb-copy" onclick="copyCode(this)">copier</button>
+          </div>
+          <pre><span class="directive">memory_limit</span>       = <span class="value">256M</span>
+<span class="directive">max_execution_time</span> = <span class="value">30</span>
+<span class="directive">upload_max_filesize</span> = <span class="value">50M</span>
+<span class="directive">post_max_size</span>      = <span class="value">50M</span>
+<span class="directive">display_errors</span>     = <span class="value">Off</span>   <span class="comment">; JAMAIS On en prod</span>
+<span class="directive">log_errors</span>         = <span class="value">On</span>
+<span class="directive">extension</span>=<span class="value">pdo_mysql</span>
+<span class="directive">extension</span>=<span class="value">mysqli</span></pre>
+        </div>
+      </div>
+    </details>
+
+    <h3 id="cfg-mariadb" class="reveal">4.4 MariaDB</h3>
+
+    <div class="codeblock reveal">
+      <div class="cb-header">
+        <div class="cb-dots"><span></span><span></span><span></span></div>
+        <span class="cb-filename">/etc/mysql/mariadb.conf.d/50-server.cnf</span>
+        <button class="cb-copy" onclick="copyCode(this)">copier</button>
+      </div>
+      <pre><span class="section">[mysqld]</span>
+<span class="directive">bind-address</span> = <span class="value">127.0.0.1</span>
+<span class="directive">port</span>         = <span class="value">3306</span>
+
+<span class="comment"># InnoDB — adapter à la RAM dispo</span>
+<span class="directive">innodb_buffer_pool_size</span>        = <span class="value">1G</span>
+<span class="directive">innodb_log_file_size</span>           = <span class="value">256M</span>
+<span class="directive">innodb_flush_log_at_trx_commit</span> = <span class="value">2</span>
+
+<span class="comment"># Slow query log</span>
+<span class="directive">slow_query_log</span>      = <span class="value">1</span>
+<span class="directive">slow_query_log_file</span> = <span class="string">/var/log/mysql/slow-query.log</span>
+<span class="directive">long_query_time</span>     = <span class="value">1</span>
+
+<span class="directive">character-set-server</span> = <span class="value">utf8mb4</span>
+<span class="directive">collation-server</span>    = <span class="value">utf8mb4_unicode_ci</span></pre>
+    </div>
+
+    <details class="reveal">
+      <summary>Cr&eacute;er un utilisateur et une base pour un site</summary>
+      <div class="details-body">
+        <div class="codeblock">
+          <div class="cb-header">
+            <div class="cb-dots"><span></span><span></span><span></span></div>
+            <span class="cb-filename">mysql shell</span>
+            <button class="cb-copy" onclick="copyCode(this)">copier</button>
+          </div>
+          <pre><span class="prompt">mysql&gt;</span> <span class="keyword">CREATE DATABASE</span> app_db
+       <span class="keyword">CHARACTER SET</span> <span class="value">utf8mb4</span>
+       <span class="keyword">COLLATE</span> <span class="value">utf8mb4_unicode_ci</span>;
+
+<span class="prompt">mysql&gt;</span> <span class="keyword">CREATE USER</span> <span class="string">'app_user'</span>@<span class="string">'localhost'</span>
+       <span class="keyword">IDENTIFIED BY</span> <span class="string">'&lt;MOT_DE_PASSE_FORT&gt;'</span>;
+
+<span class="prompt">mysql&gt;</span> <span class="keyword">GRANT ALL PRIVILEGES ON</span> app_db.*
+       <span class="keyword">TO</span> <span class="string">'app_user'</span>@<span class="string">'localhost'</span>;
+
+<span class="prompt">mysql&gt;</span> <span class="keyword">FLUSH PRIVILEGES</span>;</pre>
+        </div>
+      </div>
+    </details>
+
+    <h3 id="cfg-ssl" class="reveal">4.5 SSL / Certbot</h3>
+
+    <div class="reveal">
+      <p>Avec HAProxy en frontal, Certbot fonctionne en mode <code>standalone</code>. Il faut temporairement lib&eacute;rer le port 80.</p>
+    </div>
+
+    <div class="codeblock reveal">
+      <div class="cb-header">
+        <div class="cb-dots"><span></span><span></span><span></span></div>
+        <span class="cb-filename">Proc&eacute;dure compl&egrave;te</span>
+        <button class="cb-copy" onclick="copyCode(this)">copier</button>
+      </div>
+      <pre><span class="comment"># 1. Libérer le port 80</span>
+<span class="prompt">$</span> systemctl stop haproxy
+
+<span class="comment"># 2. Demander le certificat</span>
+<span class="prompt">$</span> certbot certonly <span class="flag">--standalone</span> \
+    <span class="flag">--http-01-port</span> <span class="value">80</span> \
+    <span class="flag">-d</span> <span class="string">exemple.fr</span> \
+    <span class="flag">--email</span> <span class="string">admin@exemple.fr</span> \
+    <span class="flag">--agree-tos</span> <span class="flag">--non-interactive</span>
+
+<span class="comment"># 3. Combiner fullchain + privkey pour HAProxy</span>
+<span class="prompt">$</span> cat /etc/letsencrypt/live/exemple.fr/fullchain.pem \
+      /etc/letsencrypt/live/exemple.fr/privkey.pem \
+      &gt; /etc/haproxy/certs/exemple.fr.pem
+
+<span class="comment"># 4. Rétablir HAProxy</span>
+<span class="prompt">$</span> systemctl start haproxy
+
+<span class="comment"># 5. Vérifier</span>
+<span class="prompt">$</span> echo | openssl s_client -connect exemple.fr:443 2&gt;/dev/null \
+    | openssl x509 -noout -dates</pre>
+    </div>
+
+    <div class="note-box danger reveal">
+      <span class="note-label">&#9888; Important</span>
+      Cette proc&eacute;dure provoque une <strong>coupure de service</strong> pendant la g&eacute;n&eacute;ration. En prod, privil&eacute;giez le challenge DNS ou les hooks <code>--pre-hook</code> / <code>--post-hook</code> de Certbot.
+    </div>
+
+    <details class="reveal">
+      <summary>Renouvellement automatique via cron</summary>
+      <div class="details-body">
+        <div class="codeblock">
+          <div class="cb-header">
+            <div class="cb-dots"><span></span><span></span><span></span></div>
+            <span class="cb-filename">/etc/cron.d/certbot-haproxy</span>
+            <button class="cb-copy" onclick="copyCode(this)">copier</button>
+          </div>
+          <pre><span class="comment"># Renouvellement mensuel à 3h du matin</span>
+0 3 1 * * root \
+    systemctl stop haproxy &amp;&amp; \
+    certbot renew --quiet &amp;&amp; \
+    for domain in /etc/letsencrypt/live/*/; do \
+        d=$(basename "$domain"); \
+        cat "$domain/fullchain.pem" "$domain/privkey.pem" \
+            &gt; "/etc/haproxy/certs/$d.pem"; \
+    done &amp;&amp; \
+    systemctl start haproxy</pre>
+        </div>
+      </div>
+    </details>
+
+    <!-- ────────── 5. PORTS ────────── -->
+    <h2 id="ports" class="reveal"><span class="section-num">5.</span> Ports &amp; protocoles</h2>
+
+    <table class="wiki-table reveal">
+      <thead>
+        <tr><th>Service</th><th>Port</th><th>Proto</th><th>Direction</th><th>Remarques</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>DNS</td><td class="port">53</td><td><span class="proto">UDP/TCP</span></td><td>Client &rarr; R&eacute;solveur</td><td>Avant toute connexion</td></tr>
+        <tr><td>HAProxy (HTTP)</td><td class="port">80</td><td><span class="proto">TCP</span></td><td>Client &rarr; HAProxy</td><td>Redirect 301 &rarr; HTTPS</td></tr>
+        <tr><td>HAProxy (HTTPS)</td><td class="port">443</td><td><span class="proto">TLS</span></td><td>Client &rarr; HAProxy</td><td>Terminaison SSL + ACL</td></tr>
+        <tr><td>Apache2</td><td class="port">80</td><td><span class="proto">TCP</span></td><td>HAProxy &rarr; Apache</td><td>HTTP interne uniquement</td></tr>
+        <tr><td>PHP-FPM</td><td class="port">&mdash;</td><td><span class="proto">UNIX</span></td><td>Apache &rarr; PHP-FPM</td><td><code>/run/php/php-fpm.sock</code></td></tr>
+        <tr><td>MariaDB</td><td class="port">3306</td><td><span class="proto">TCP</span></td><td>PHP &rarr; MariaDB</td><td><code>bind 127.0.0.1</code></td></tr>
+      </tbody>
+    </table>
+
+    <div class="note-box info reveal">
+      <span class="note-label">&#8505; Note</span>
+      Seuls les ports 80 et 443 sont expos&eacute;s sur l'IP publique via DNAT. Le reste transite sur le r&eacute;seau interne priv&eacute;.
+    </div>
+
+    <!-- ────────── 6. TROUBLESHOOTING ────────── -->
+    <h2 id="troubleshoot" class="reveal"><span class="section-num">6.</span> Troubleshooting</h2>
+
+    <div class="reveal">
+      <p>Diagnostiquez toujours <strong>de l'ext&eacute;rieur vers l'int&eacute;rieur</strong> : DNS &rarr; HAProxy &rarr; Apache &rarr; PHP &rarr; BDD.</p>
+    </div>
+
+    <div class="trouble-grid">
+
+      <details class="trouble-card reveal">
+        <summary>
+          <span class="trouble-icon">&#128683;</span>
+          ERR_NAME_NOT_RESOLVED &mdash; Le domaine ne r&eacute;sout pas
+          <span class="trouble-chevron">&#9660;</span>
+        </summary>
+        <div class="trouble-body">
+          <p>L'enregistrement DNS A est absent ou pointe vers la mauvaise IP. V&eacute;rifier la zone chez le registrar et le TTL.</p>
+          <div class="check-cmd"><span class="prompt">$</span> dig exemple.fr +short @8.8.8.8</div>
+        </div>
+      </details>
+
+      <details class="trouble-card reveal">
+        <summary>
+          <span class="trouble-icon">&#128683;</span>
+          ERR_CONNECTION_REFUSED &mdash; Rien n'&eacute;coute
+          <span class="trouble-chevron">&#9660;</span>
+        </summary>
+        <div class="trouble-body">
+          <p>HAProxy est down ou le firewall bloque. V&eacute;rifier le service et les r&egrave;gles iptables/DNAT.</p>
+          <div class="check-cmd"><span class="prompt">$</span> ss -tlnp | grep -E ':80|:443' &amp;&amp; systemctl status haproxy</div>
+        </div>
+      </details>
+
+      <details class="trouble-card reveal">
+        <summary>
+          <span class="trouble-icon">&#128683;</span>
+          503 Service Unavailable &mdash; Backend injoignable
+          <span class="trouble-chevron">&#9660;</span>
+        </summary>
+        <div class="trouble-body">
+          <p>HAProxy ne peut pas joindre Apache (conteneur down, IP incorrecte, Apache stopp&eacute;).</p>
+          <div class="check-cmd"><span class="prompt">$</span> curl -v http://10.0.0.10:80 &amp;&amp; systemctl status apache2</div>
+        </div>
+      </details>
+
+      <details class="trouble-card reveal">
+        <summary>
+          <span class="trouble-icon">&#128683;</span>
+          502 Bad Gateway &mdash; PHP-FPM ne r&eacute;pond plus
+          <span class="trouble-chevron">&#9660;</span>
+        </summary>
+        <div class="trouble-body">
+          <p>Le socket PHP-FPM est absent, mauvaises permissions, ou le service a crash&eacute;.</p>
+          <div class="check-cmd"><span class="prompt">$</span> ls -la /run/php/php8.2-fpm.sock &amp;&amp; systemctl status php8.2-fpm</div>
+        </div>
+      </details>
+
+      <details class="trouble-card reveal">
+        <summary>
+          <span class="trouble-icon">&#128683;</span>
+          Page blanche / HTTP 500 &mdash; Erreur fatale PHP
+          <span class="trouble-chevron">&#9660;</span>
+        </summary>
+        <div class="trouble-body">
+          <p>Erreur de syntaxe, extension manquante ou exception non catch&eacute;e.</p>
+          <div class="check-cmd"><span class="prompt">$</span> tail -30 /var/log/php/exemple-error.log</div>
+        </div>
+      </details>
+
+      <details class="trouble-card reveal">
+        <summary>
+          <span class="trouble-icon">&#128683;</span>
+          SQLSTATE[HY000] &mdash; Connexion BDD refus&eacute;e
+          <span class="trouble-chevron">&#9660;</span>
+        </summary>
+        <div class="trouble-body">
+          <p>MariaDB stopp&eacute;e, credentials incorrects ou droits SQL manquants.</p>
+          <div class="check-cmd"><span class="prompt">$</span> systemctl status mariadb &amp;&amp; mysql -u app_user -p -e "SHOW DATABASES;"</div>
+        </div>
+      </details>
+
+      <details class="trouble-card reveal">
+        <summary>
+          <span class="trouble-icon">&#128683;</span>
+          NET::ERR_CERT_DATE_INVALID &mdash; Certificat expir&eacute;
+          <span class="trouble-chevron">&#9660;</span>
+        </summary>
+        <div class="trouble-body">
+          <p>Le cron de renouvellement a &eacute;chou&eacute; ou le .pem n'a pas &eacute;t&eacute; reg&eacute;n&eacute;r&eacute;.</p>
+          <div class="check-cmd"><span class="prompt">$</span> echo | openssl s_client -connect exemple.fr:443 2&gt;/dev/null | openssl x509 -noout -dates</div>
+        </div>
+      </details>
+
+      <details class="trouble-card reveal">
+        <summary>
+          <span class="trouble-icon">&#128683;</span>
+          Lenteurs &gt; 2s &mdash; Requ&ecirc;tes lentes
+          <span class="trouble-chevron">&#9660;</span>
+        </summary>
+        <div class="trouble-body">
+          <p>SQL lent, pool FPM satur&eacute; ou buffer pool InnoDB sous-dimensionn&eacute;.</p>
+          <div class="check-cmd"><span class="prompt">$</span> tail -20 /var/log/mysql/slow-query.log</div>
+        </div>
+      </details>
+
+    </div>
+
+    <div class="note-box tip reveal">
+      <span class="note-label">&#9889; M&eacute;thodologie N2</span>
+      Toujours diagnostiquer <strong>de l'ext&eacute;rieur vers l'int&eacute;rieur</strong>. Isolez la couche en d&eacute;faut avant d'approfondir. Un <code>curl -v</code> &agrave; chaque &eacute;tape suffit souvent &agrave; trouver.
+    </div>
+
+  </main>
+</div>
+
+<!-- ═══════════════════ FOOTER ═══════════════════ -->
+<footer class="site-footer">
+  <div class="footer-inner">
+    <span>lamp-stack-docs v1.0 &mdash; Support N2 &mdash; &Eacute;quipe Infrastructure</span>
+    <span>G&eacute;n&eacute;r&eacute; le 2026-03-13 &mdash; <a href="#">Signaler une erreur</a></span>
+  </div>
+</footer>
+
+<!-- ═══════════════════ BACK TO TOP ═══════════════════ -->
+<button class="back-to-top" id="backToTop" onclick="window.scrollTo({top:0})" aria-label="Retour en haut">&#8593;</button>
+
+<!-- ═══════════════════ JAVASCRIPT ═══════════════════ -->
+<script>
+/* ── Flow Simulator ── */
+function showStep(n) {
+  document.querySelectorAll('.flow-tab').forEach((b, i) => b.classList.toggle('active', i === n));
+  document.querySelectorAll('.flow-panel').forEach((d, i) => {
+    d.classList.toggle('active', i === n);
+  });
+  document.querySelectorAll('.flow-progress-seg').forEach((s, i) => {
+    s.classList.toggle('filled', i <= n);
+  });
+}
+
+/* ── Copy Code ── */
+function copyCode(btn) {
+  const pre = btn.closest('.codeblock').querySelector('pre');
+  navigator.clipboard.writeText(pre.textContent).then(() => {
+    btn.textContent = 'copié ✓';
+    btn.classList.add('copied');
+    setTimeout(() => {
+      btn.textContent = 'copier';
+      btn.classList.remove('copied');
+    }, 2000);
+  });
+}
+
+/* ── Theme Toggle ── */
+function toggleTheme() {
+  const html = document.documentElement;
+  const next = html.dataset.theme === 'dark' ? 'light' : 'dark';
+  html.dataset.theme = next;
+  document.querySelector('.theme-icon').innerHTML = next === 'dark' ? '&#9790;' : '&#9788;';
+  localStorage.setItem('theme', next);
+}
+
+/* Restore saved theme */
+(function() {
+  const saved = localStorage.getItem('theme');
+  if (saved) {
+    document.documentElement.dataset.theme = saved;
+    if (saved === 'light') {
+      document.querySelector('.theme-icon').innerHTML = '&#9788;';
+    }
+  }
+})();
+
+/* ── Mobile Sidebar ── */
+function toggleSidebar() {
+  document.getElementById('sidebar').classList.toggle('open');
+  document.querySelector('.sidebar-overlay').classList.toggle('open');
+}
+
+/* ── Back to Top ── */
+const backBtn = document.getElementById('backToTop');
+window.addEventListener('scroll', () => {
+  backBtn.classList.toggle('visible', window.scrollY > 600);
+}, { passive: true });
+
+/* ── Scroll Spy for TOC ── */
+const tocLinks = document.querySelectorAll('.toc a');
+const spyHeadings = [];
+tocLinks.forEach(link => {
+  const id = link.getAttribute('href')?.slice(1);
+  const el = id && document.getElementById(id);
+  if (el) spyHeadings.push({ el, link });
+});
+
+window.addEventListener('scroll', () => {
+  let current = spyHeadings[0];
+  for (const h of spyHeadings) {
+    if (window.scrollY >= h.el.offsetTop - 80) current = h;
+  }
+  tocLinks.forEach(l => l.classList.remove('active'));
+  if (current) current.link.classList.add('active');
+}, { passive: true });
+
+/* ── Scroll Reveal Animations ── */
+const observer = new IntersectionObserver((entries) => {
+  entries.forEach(entry => {
+    if (entry.isIntersecting) {
+      entry.target.classList.add('visible');
+    }
+  });
+}, {
+  threshold: 0.1,
+  rootMargin: '0px 0px -40px 0px'
+});
+
+document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+
+/* ── Close sidebar on link click (mobile) ── */
+document.querySelectorAll('.toc a').forEach(link => {
+  link.addEventListener('click', () => {
+    if (window.innerWidth <= 900) {
+      document.getElementById('sidebar').classList.remove('open');
+      document.querySelector('.sidebar-overlay').classList.remove('open');
+    }
+  });
+});
+</script>
+
+</body>
+</html>
